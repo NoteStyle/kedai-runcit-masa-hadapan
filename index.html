@@ -1,453 +1,405 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart-Grocer Board (SGB) - Kedai Runcit Masa Hadapan</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
+    <style>
+        :root {
+            --primary: #2d6a4f;
+            --secondary: #40916c;
+            --accent: #d8f3dc;
+            --dark: #1b4332;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f9f4;
+            margin: 0;
+            padding: 15px;
+            color: #333;
+        }
 
-<title>Smart-Grocer Board (SGB)</title>
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
 
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+        <h1> {
+            text-align: center;
+            color: var(--primary);
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
 
-<style>
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
 
-:root{
-    --primary:#2d6a4f;
-    --secondary:#40916c;
-    --accent:#d8f3dc;
-}
+        .game-zone {
+            background: var(--accent);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px dashed var(--secondary);
+        }
 
-*{
-    box-sizing:border-box;
-}
+        /* Kotak Kamera Diperkukuh */
+        #reader {
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 15px 0;
+            border: 2px solid var(--primary);
+        }
 
-body{
-    margin:0;
-    padding:20px;
-    font-family:Arial,sans-serif;
-    background:#f5f7f5;
-}
+        /* Membetulkan orientasi dan paparan video dalam elemen library */
+        #reader video {
+            object-fit: cover !important;
+            width: 100% !important;
+        }
 
-.container{
-    max-width:900px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:15px;
-    box-shadow:0 0 15px rgba(0,0,0,0.1);
-}
+        .situation-box {
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 15px;
+            margin: 10px 0;
+            min-height: 20px;
+        }
 
-h1{
-    text-align:center;
-    color:var(--primary);
-}
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
 
-.subtitle{
-    text-align:center;
-    color:#666;
-    margin-bottom:20px;
-}
+        .cart-table th, .cart-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
 
-#reader{
-    width:100%;
-    max-width:450px;
-    margin:auto;
-}
+        .cart-table th {
+            background-color: var(--secondary);
+            color: white;
+        }
 
-.status{
-    margin-top:15px;
-    text-align:center;
-    font-weight:bold;
-    color:var(--primary);
-}
+        .total-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e63946;
+            margin: 15px 0 5px 0;
+            text-align: right;
+        }
 
-table{
-    width:100%;
-    margin-top:20px;
-    border-collapse:collapse;
-}
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.2s;
+            margin-bottom: 5px;
+        }
 
-th{
-    background:var(--primary);
-    color:white;
-}
+        .btn:hover {
+            background: var(--secondary);
+        }
 
-th,td{
-    padding:12px;
-    border:1px solid #ddd;
-}
+        .btn-clear {
+            background-color: #6c757d;
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+            margin-top: 5px;
+        }
 
-.total{
-    text-align:right;
-    font-size:24px;
-    font-weight:bold;
-    color:#d62828;
-    margin-top:15px;
-}
+        .calc-section {
+            margin-top: 20px;
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+        }
 
-.section{
-    margin-top:30px;
-}
+        .input-group {
+            margin-bottom: 15px;
+        }
 
-label{
-    display:block;
-    margin-bottom:5px;
-    font-weight:bold;
-}
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
 
-input{
-    width:100%;
-    padding:10px;
-    margin-bottom:15px;
-    border:1px solid #ccc;
-    border-radius:6px;
-}
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
 
-button{
-    background:var(--primary);
-    color:white;
-    border:none;
-    padding:12px 20px;
-    border-radius:8px;
-    cursor:pointer;
-    margin-right:10px;
-}
+        .result-box {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
 
-button:hover{
-    background:var(--secondary);
-}
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
 
-.result{
-    margin-top:15px;
-    padding:15px;
-    border-radius:8px;
-    display:none;
-}
+        .wrong {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
 
-.correct{
-    background:#d4edda;
-    color:#155724;
-}
-
-.wrong{
-    background:#f8d7da;
-    color:#721c24;
-}
-
-@media(max-width:600px){
-
-    th,td{
-        font-size:13px;
-    }
-
-    .total{
-        font-size:20px;
-    }
-
-}
-
-</style>
+        .bentuk-lazim {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 24px;
+            display: inline-block;
+            text-align: right;
+            margin: 15px auto;
+            padding: 10px 20px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            letter-spacing: 2px;
+        }
+        
+        .line {
+            border-bottom: 3px solid #333;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .flex-center {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
+    <h1>Smart-Grocer Board (SGB) 🛒</h1>
+    <div class="subtitle">Minda Inovatif, Jiwa Adaptif | Sukma Pendidik 2035</div>
 
-<h1>🛒 Smart-Grocer Board</h1>
+    <div class="game-zone">
+        <label style="text-align: left; display: block; font-weight: bold;">Acukan Kod QR Barang Pada Kamera:</label>
+        
+        <div id="reader"></div>
+        
+        <div id="situation" class="situation-box">Sila imbas kod QR barang untuk dimasukkan ke dalam bakul belanjaan.</div>
+        
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Nama Barang</th>
+                    <th>Harga (RM)</th>
+                </tr>
+            </thead>
+            <tbody id="cart-items">
+                <tr>
+                    <td colspan="2" style="text-align:center; color:#999;">Bakul kosong. Sila scan barang.</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div id="total-price" class="total-display">Jumlah: RM 0.00</div>
+        <button class="btn btn-clear" onclick="kosongkanBakul()">Kosongkan Bakul</button>
+    </div>
 
-<div class="subtitle">
-Minda Inovatif, Jiwa Adaptif
+    <div class="calc-section">
+        <h3>Sistem Semakan Juruwang Bijak</h3>
+        
+        <div class="input-group">
+            <label for="bayaran">Wang Diterima (RM):</label>
+            <input type="number" id="bayaran" step="0.05" placeholder="Contoh: 10.00">
+        </div>
+
+        <div class="input-group">
+            <label for="bakiMurid">Kira Wang Baki Murid (RM):</label>
+            <input type="number" id="bakiMurid" step="0.05" placeholder="Masukkan jawapan anda">
+        </div>
+
+        <button class="btn" style="background-color: #2a9d8f;" onclick="semakKiraan()">Semak Jawapan & Bentuk Lazim</button>
+        
+        <div id="feedback" class="result-box">
+            <div id="textFeedback" style="margin-bottom: 15px;"></div>
+            <div class="flex-center">
+                <div id="paparanBentukLazim" class="bentuk-lazim"></div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<div id="reader"></div>
-
-<div id="status" class="status">
-Sila imbas QR Code barang
-</div>
-
-<table>
-
-<thead>
-<tr>
-<th>Barang</th>
-<th>Harga (RM)</th>
-</tr>
-</thead>
-
-<tbody id="cart">
-<tr>
-<td colspan="2" align="center">
-Bakul kosong
-</td>
-</tr>
-</tbody>
-
-</table>
-
-<div id="total" class="total">
-Jumlah: RM 0.00
-</div>
-
-<br>
-
-<button onclick="clearCart()">
-Kosongkan Bakul
-</button>
-
-<button onclick="stopScanner()">
-Henti Scanner
-</button>
-
-<div class="section">
-
-<h2>Sistem Juruwang</h2>
-
-<label>Wang Diterima (RM)</label>
-<input type="number" id="bayaran" step="0.01">
-
-<label>Baki Yang Dikira Murid (RM)</label>
-<input type="number" id="jawapan" step="0.01">
-
-<button onclick="checkAnswer()">
-Semak Jawapan
-</button>
-
-<div id="feedback" class="result"></div>
-
-</div>
-
-</div>
-
-<audio id="beep">
-<source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg">
-</audio>
 
 <script>
+    // Pangkalan data produk - Dubai Chewy Cookie telah berjaya dimasukkan ke dalam sistem
+    const dataBarang = {
+        "biskut": { nama: "Biskut Serat Sihat", hargaAsal: 4.50, situasi: "Promosi: Potongan RM 0.50", beza: -0.50 },
+        "pensel": { nama: "Pensel 2B Lestari", hargaAsal: 1.20, situasi: "Cukai: Tambah RM 0.10", beza: 0.10 },
+        "roti":   { nama: "Roti Gandum Penuh", hargaAsal: 3.20, situasi: "Subsidi: Potongan RM 0.20", beza: -0.20 },
+        "buku":   { nama: "Buku Tulis Garis Tiga", hargaAsal: 2.00, situasi: "Tiada Perubahan Harga", beza: 0.00 },
+        "susu":   { nama: "Susu Kotak Kalsium Tinggi", hargaAsal: 5.80, situasi: "Inflasi: Tambah RM 0.40", beza: 0.40 },
+        "dubai":  { nama: "Dubai Chewy Cookie", hargaAsal: 15.00, situasi: "Produk Viral: Tiada Perubahan Harga", beza: 0.00 }
+    };
 
-const barang = {
+    let bakulBelanja = [];
+    let jumlahKeseluruhan = 0;
+    let lastScannedToken = "";
+    let lastScannedTime = 0;
 
-    "biskut":{
-        nama:"Biskut Serat Sihat",
-        harga:4.00
-    },
-
-    "pensel":{
-        nama:"Pensel 2B",
-        harga:1.30
-    },
-
-    "roti":{
-        nama:"Roti Gandum",
-        harga:3.00
-    },
-
-    "buku":{
-        nama:"Buku Tulis",
-        harga:2.00
-    },
-
-    "susu":{
-        nama:"Susu Kotak",
-        harga:6.20
-    }
-
-};
-
-let bakul=[];
-let jumlah=0;
-
-let scanner;
-
-let lastCode="";
-let lastTime=0;
-
-function scanSuccess(decodedText){
-
-    const now=Date.now();
-
-    if(
-        decodedText===lastCode &&
-        now-lastTime<3000
-    ){
-        return;
-    }
-
-    lastCode=decodedText;
-    lastTime=now;
-
-    const token=decodedText.toLowerCase();
-
-    for(let key in barang){
-
-        if(token.includes(key)){
-
-            document.getElementById("beep").play();
-
-            bakul.push(barang[key]);
-
-            document.getElementById("status").innerHTML=
-            "✅ "+barang[key].nama+" berjaya diimbas";
-
-            updateCart();
-
+    function onScanSuccess(decodedText, decodedResult) {
+        const token = decodedText.toLowerCase().trim();
+        const currentTime = Date.now();
+        
+        // Anti-spam respons pantas (1.5 saat)
+        if (token === lastScannedToken && (currentTime - lastScannedTime < 1500)) {
             return;
+        }
+
+        if (dataBarang[token]) {
+            lastScannedToken = token;
+            lastScannedTime = currentTime;
+
+            const barang = dataBarang[token];
+            const hargaFinal = barang.hargaAsal + barang.beza;
+
+            bakulBelanja.push({
+                nama: barang.nama,
+                harga: hargaFinal
+            });
+
+            document.getElementById("situation").innerHTML = `✅ Berjaya Scan: <b>${barang.nama}</b> (${barang.situasi})`;
+            kemasKiniPaparanBakul();
+        } else {
+            // Logik toleransi mengesan sub-string dalam kod QR rawak
+            for (let kunci in dataBarang) {
+                if (token.includes(kunci)) {
+                    onScanSuccess(kunci, decodedResult);
+                    return;
+                }
+            }
+            document.getElementById("situation").innerText = "⚠️ Sila jauhkan atau dekatkan kod QR sedikit untuk fokus kamera.";
         }
     }
 
-    document.getElementById("status").innerHTML=
-    "❌ QR tidak dikenali";
-}
+    function kemasKiniPaparanBakul() {
+        const tbody = document.getElementById("cart-items");
+        
+        if (bakulBelanja.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#999;">Bakul kosong. Sila scan barang.</td></tr>`;
+            jumlahKeseluruhan = 0;
+            document.getElementById("total-price").innerText = "Jumlah: RM 0.00";
+            return;
+        }
 
-function scanFail(error){}
+        tbody.innerHTML = "";
+        jumlahKeseluruhan = 0;
 
-function updateCart(){
+        bakulBelanja.forEach(item => {
+            jumlahKeseluruhan += item.harga;
+            const row = `<tr>
+                <td>${item.nama}</td>
+                <td>RM ${item.harga.toFixed(2)}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
 
-    const tbody=document.getElementById("cart");
-
-    if(bakul.length===0){
-
-        tbody.innerHTML=
-        `<tr>
-        <td colspan="2" align="center">
-        Bakul kosong
-        </td>
-        </tr>`;
-
-        jumlah=0;
-
-        document.getElementById("total").innerHTML=
-        "Jumlah: RM 0.00";
-
-        return;
+        document.getElementById("total-price").innerText = `Jumlah: RM ${jumlahKeseluruhan.toFixed(2)}`;
+        document.getElementById("feedback").style.display = "none";
     }
 
-    tbody.innerHTML="";
+    function kosongkanBakul() {
+        bakulBelanja = [];
+        lastScannedToken = "";
+        document.getElementById("situation").innerText = "Bakul telah dikosongkan. Sila scan barang baru.";
+        kemasKiniPaparanBakul();
+    }
 
-    jumlah=0;
+    // Konfigurasi Engine Pengimbas Kamera (html5-qrcode v2.3.8)
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", { 
+            fps: 20,                  // 20 FPS untuk pengesanan kod QR yang ultra-pantas
+            experimentalFeatures: {
+                useBarCodeDetectorIfSupported: true // Memanfaatkan keupayaan dekoder native peranti
+            },
+            rememberLastUsedCamera: true
+        }, false);
+    
+    html5QrcodeScanner.render(onScanSuccess, function(err){/* Meredam ralat log pemfokusan bingkai kosong */});
 
-    bakul.forEach(item=>{
+    function semakKiraan() {
+        const bayaran = parseFloat(document.getElementById("bayaran").value);
+        const bakiMurid = parseFloat(document.getElementById("bakiMurid").value);
+        const feedback = document.getElementById("feedback");
+        const textFeedback = document.getElementById("textFeedback");
+        const paparanBentukLazim = document.getElementById("paparanBentukLazim");
 
-        jumlah+=item.harga;
+        if (isNaN(bayaran) || isNaN(bakiMurid) || jumlahKeseluruhan === 0) {
+            feedback.className = "result-box wrong";
+            textFeedback.innerText = "⚠️ Ralat: Sila pastikan anda telah mengimbas sekurang-kurangnya 1 barang dan mengisi ruangan wang bayaran serta baki!";
+            paparanBentukLazim.parentElement.style.display = "none";
+            feedback.style.display = "block";
+            return;
+        }
 
-        tbody.innerHTML+=`
-        <tr>
-        <td>${item.nama}</td>
-        <td>RM ${item.harga.toFixed(2)}</td>
-        </tr>
+        const bakiSebenar = bayaran - jumlahKeseluruhan;
+
+        if (bayaran < jumlahKeseluruhan) {
+            feedback.className = "result-box wrong";
+            textFeedback.innerText = "❌ Wang diterima tidak mencukupi untuk membayar jumlah keseluruhan bakul!";
+            paparanBentukLazim.parentElement.style.display = "none";
+            feedback.style.display = "block";
+            return;
+        }
+
+        // Memaparkan pengiraan interaktif berbentuk jalan kerja tradisional (Bentuk Lazim)
+        paparanBentukLazim.parentElement.style.display = "flex";
+        paparanBentukLazim.innerHTML = `
+            <div>RM ${bayaran.toFixed(2).padStart(6, ' ')}</div>
+            <div>- RM ${jumlahKeseluruhan.toFixed(2).padStart(6, ' ')}</div>
+            <div class="line"></div>
+            <div>RM ${bakiSebenar.toFixed(2).padStart(6, ' ')}</div>
+            <div class="line" style="border-bottom: 1px solid #333; height:2px; margin-top:2px;"></div>
         `;
 
-    });
+        if (Math.abs(bakiMurid - bakiSebenar) < 0.01) {
+            feedback.className = "result-box correct";
+            textFeedback.innerText = `🎉 TAHNIAH! Pengiraan baki anda bagi ${bakulBelanja.length} barang adalah TEPAT. Anda Juruwang Alaf Baharu yang cemerlang!`;
+        } else {
+            feedback.className = "result-box wrong";
+            textFeedback.innerText = `❌ JAWAPAN KURANG TEPAT. Sila semak semula jalan kerja tolak dalam bentuk lazim di bawah:`;
+        }
 
-    document.getElementById("total").innerHTML=
-    `Jumlah: RM ${jumlah.toFixed(2)}`;
-}
-
-function clearCart(){
-
-    bakul=[];
-
-    updateCart();
-
-    document.getElementById("status").innerHTML=
-    "Bakul dikosongkan";
-}
-
-function checkAnswer(){
-
-    const bayaran=
-    parseFloat(document.getElementById("bayaran").value);
-
-    const jawapan=
-    parseFloat(document.getElementById("jawapan").value);
-
-    const feedback=
-    document.getElementById("feedback");
-
-    if(isNaN(bayaran)||isNaN(jawapan)){
-
-        feedback.style.display="block";
-        feedback.className="result wrong";
-        feedback.innerHTML=
-        "Sila isi semua ruangan.";
-
-        return;
+        feedback.style.display = "block";
     }
-
-    if(bayaran<jumlah){
-
-        feedback.style.display="block";
-        feedback.className="result wrong";
-        feedback.innerHTML=
-        "Wang tidak mencukupi.";
-
-        return;
-    }
-
-    const baki=bayaran-jumlah;
-
-    if(Math.abs(jawapan-baki)<0.01){
-
-        feedback.style.display="block";
-        feedback.className="result correct";
-        feedback.innerHTML=
-        `Tahniah! Jawapan betul.<br>
-        Baki sebenar = RM ${baki.toFixed(2)}`;
-
-    }else{
-
-        feedback.style.display="block";
-        feedback.className="result wrong";
-        feedback.innerHTML=
-        `Jawapan kurang tepat.<br>
-        Baki sebenar = RM ${baki.toFixed(2)}`;
-    }
-}
-
-async function startScanner(){
-
-    try{
-
-        scanner=new Html5Qrcode("reader");
-
-        await scanner.start(
-
-            {
-                facingMode:"environment"
-            },
-
-            {
-                fps:20,
-                qrbox:{
-                    width:250,
-                    height:250
-                }
-            },
-
-            scanSuccess,
-            scanFail
-
-        );
-
-    }
-    catch(error){
-
-        document.getElementById("status").innerHTML=
-        "Gagal mengakses kamera";
-    }
-}
-
-async function stopScanner(){
-
-    if(scanner){
-
-        await scanner.stop();
-        await scanner.clear();
-
-        document.getElementById("status").innerHTML=
-        "Scanner dihentikan";
-    }
-}
-
-startScanner();
-
 </script>
 
 </body>
